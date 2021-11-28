@@ -30,7 +30,16 @@ navigator?.geolocation?.getCurrentPosition(
       console.log(lat, lng);
       L.marker([lat, lng])
         .addTo(map)
-        .bindPopup(`Workout: ${[lat, lng]}`)
+        .bindPopup(
+          L.popup({
+            maxWidth: 250,
+            minWidth: 100,
+            autoClose: false,
+            closeOnClick: false,
+            className: 'running-popup',
+          })
+        )
+        .setPopupContent('Workout')
         .openPopup();
     });
   },
