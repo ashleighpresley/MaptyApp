@@ -15,7 +15,20 @@ navigator?.geolocation?.getCurrentPosition(
   function (pos) {
     const { latitude } = pos.coords;
     const { longitude } = pos.coords;
+    const coords = [latitude, longitude];
     console.log(`https://www.google.com/maps/@${latitude},${longitude}`);
+    //the second value in this setView function is the zoom level - the smaller the value the more zoomed out it will be
+    const map = L.map('map').setView(coords, 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
+
+    L.marker(coords)
+      .addTo(map)
+      .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
+      .openPopup();
   },
   function () {
     alert('Could not get your position');
