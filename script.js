@@ -42,6 +42,7 @@ class Running extends Workout {
     return this.pace;
   }
 }
+
 class Cycling extends Workout {
   type = 'cycling';
   constructor(coords, distance, duration, elevation) {
@@ -61,6 +62,7 @@ class Cycling extends Workout {
 class App {
   #map;
   #mapEvent;
+  #mapZoomLevel = 13;
   #workouts = [];
   constructor() {
     this._getPosition();
@@ -68,6 +70,8 @@ class App {
     form.addEventListener('submit', this._newWorkout.bind(this));
 
     inputType.addEventListener('change', this._toggleElevationField);
+
+    containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
   }
 
   //get user's current position
@@ -86,7 +90,7 @@ class App {
     const { longitude } = pos.coords;
     const coords = [latitude, longitude];
     //the second value in this setView function is the zoom level - the smaller the value the more zoomed out it will be
-    this.#map = L.map('map').setView(coords, 13);
+    this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
 
     L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
       attribution:
@@ -165,7 +169,6 @@ class App {
 
     //add new object to workout array
     this.#workouts.push(workout);
-    console.log(workout);
 
     //render workout on map at marker
     this.renderWorkoutMarker(workout);
@@ -239,6 +242,24 @@ class App {
     }
 
     form.insertAdjacentHTML('afterend', html);
+  }
+
+  _moveToPopup(e) {
+    const workoutEl = e.target.closest('.workout');
+
+    if (!workoutEl) {
+      return;
+    }
+
+    const workout = this.#workouts.find(
+      work => work.id === workoutEl.dataset.id
+    );
+    this.#map.setView(workout.coords, this.#mapZoomLevel, {
+      animate: true,
+      pan: {
+        duration: 1,
+      },
+    });
   }
 }
 
