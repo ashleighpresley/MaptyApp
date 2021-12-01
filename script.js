@@ -68,6 +68,9 @@ class App {
     //Get user's position
     this._getPosition();
 
+    //Get data from local storage
+    this._getLocalStorage();
+
     //Attach event handlers
     form.addEventListener('submit', this._newWorkout.bind(this));
 
@@ -100,6 +103,10 @@ class App {
     }).addTo(this.#map);
 
     this.#map.on('click', this._showForm.bind(this));
+
+    this.#workouts.forEach(work => {
+      this._renderWorkoutMarker(work);
+    });
   }
 
   //show input form and focus on the Distance field
@@ -173,7 +180,7 @@ class App {
     this.#workouts.push(workout);
 
     //render workout on map at marker
-    this.renderWorkoutMarker(workout);
+    this._renderWorkoutMarker(workout);
 
     //render workout on list
     this._renderWorkout(workout);
@@ -184,7 +191,7 @@ class App {
     //Set local storage to all workouts
     this._setLocalStorage();
   }
-  renderWorkoutMarker(workout) {
+  _renderWorkoutMarker(workout) {
     L.marker(workout.coords)
       .addTo(this.#map)
       .bindPopup(
@@ -224,7 +231,7 @@ class App {
       html += `<div class="workout__details">
           <span class="workout__icon">⚡️</span>
           <span class="workout__value">${workout.pace.toFixed(1)}</span>
-          <span class="workout__unit">min/km</span>
+          <span class="workout__unit">km/min</span>
         </div>
         <div class="workout__details">
           <span class="workout__icon">🦶🏼</span>
@@ -236,7 +243,7 @@ class App {
       html += `<div class="workout__details">
           <span class="workout__icon">⚡️</span>
           <span class="workout__value">${workout.speed.toFixed(1)}</span>
-          <span class="workout__unit">min/km</span>
+          <span class="workout__unit">km/min</span>
         </div>
         <div class="workout__details">
           <span class="workout__icon">⛰</span>
@@ -269,6 +276,17 @@ class App {
 
   _setLocalStorage() {
     localStorage.setItem('workouts', JSON.stringify(this.#workouts));
+  }
+  _getLocalStorage() {
+    const data = JSON.parse(localStorage.getItem('workouts'));
+
+    if (!data) {
+      return;
+    }
+    this.#workouts = data;
+    this.#workouts.forEach(work => {
+      this._renderWorkout(work);
+    });
   }
 }
 
